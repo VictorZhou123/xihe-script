@@ -54,11 +54,18 @@ func (s *calculateImpl) Calculate(col *message.MatchFields) (data []byte, err er
 	data, err = exec.Command("python3", args...).Output()
 
 	if err != nil {
-		os.RemoveAll(path)
+		if err2 := os.RemoveAll(path); err2 != nil {
+			return nil, err2
+		}
+
 		return
 	}
+
 	data = bytes.ReplaceAll(bytes.TrimSpace(data), []byte(`'`), []byte(`"`))
-	os.RemoveAll(path)
+	
+	if err = os.RemoveAll(path); err != nil {
+		return
+	}
 
 	return
 }
